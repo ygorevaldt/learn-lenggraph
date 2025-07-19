@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { exampleGraph } from './core/graphs/example/example.graph';
 import { userInputGraph } from './core/graphs/user-input/user-input.graph';
-import { threadId } from 'worker_threads';
 import { randomUUID } from 'crypto';
+import { agentGraph } from './core/graphs/agent/agent.graph';
+import { HumanMessage } from '@langchain/core/messages';
 
 @Controller()
 export class AppController {
@@ -42,5 +43,28 @@ export class AppController {
       ...result,
       thread_id: threadId,
     };
+  }
+
+  @Post('/agent')
+  async agent(
+    @Body()
+    {
+      message,
+      thread_id = randomUUID(),
+    }: {
+      message: string;
+      thread_id: string;
+    },
+  ) {
+    const result = await agentGraph.invoke(
+      {
+        messages: [new HumanMessage(message)],
+      },
+      {
+        configurable: { thread_id },
+      },
+    );
+
+    return result;
   }
 }
