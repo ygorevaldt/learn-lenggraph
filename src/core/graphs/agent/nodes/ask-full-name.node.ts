@@ -1,7 +1,10 @@
 import { NodeInterrupt } from '@langchain/langgraph';
 import { StateAnnotation } from './state-annotation';
 import { geminiAgent } from 'src/core/llm/gemini-agent';
-import { cleanAiResponse } from 'src/core/common/utils/clean-ai-response';
+import {
+  generateDinamicQuestion,
+  cleanAiResponse,
+} from 'src/core/common/utils';
 
 export const askFullNameNode = async (state: typeof StateAnnotation.State) => {
   console.log('--askFullNameNode--');
@@ -20,9 +23,12 @@ export const askFullNameNode = async (state: typeof StateAnnotation.State) => {
   const aiResponse = cleanAiResponse(result);
 
   if (aiResponse == 'não') {
-    throw new NodeInterrupt(
-      'Olá! Para que eu possa te atender da melhor forma, me informe seu nome completo, por favor.',
-    );
+    const dinamicQuestion = await generateDinamicQuestion({
+      goal: 'Comprimentar o cliente cordialmente e obter seu nome completo informando que precisa disso para melhor atende-lo',
+      llm: geminiAgent,
+      messages: state.messages,
+    });
+    throw new NodeInterrupt(dinamicQuestion);
   }
 
   state.fullName = aiResponse;
