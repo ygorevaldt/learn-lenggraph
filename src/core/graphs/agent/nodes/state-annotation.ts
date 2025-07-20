@@ -1,12 +1,10 @@
-import { AIMessage, HumanMessage } from '@langchain/core/messages';
 import { Annotation } from '@langchain/langgraph';
-
-type Message = HumanMessage | AIMessage;
+import { Message } from 'src/core/common/types/node';
+import { ContextData, Customer } from '../types';
 
 export const StateAnnotation = Annotation.Root({
   messages: Annotation<Message[]>,
-  intent: Annotation<string>,
-  customerFullName: Annotation<string>,
-  email: Annotation<string>,
-  cpf: Annotation<string>,
+  contextData: Annotation<ContextData>,
+  fullName: Annotation<string>,
+  customerData: Annotation<Customer>,
 });
